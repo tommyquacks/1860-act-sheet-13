@@ -1,0 +1,27 @@
+// Xor.vm
+// Computes z = x XOR y and stores in argument[2]
+
+push argument 0   // Push x onto the stack
+push argument 1   // Push y onto the stack
+
+// Compute (x AND y)
+push argument 0   
+push argument 1   
+and               // Stack now contains (x AND y)
+
+// Compute NOT (x AND y)
+not               // Stack now contains ~(x AND y)
+
+// Store it temporarily (saved value)
+push argument 0   
+push argument 1   
+or                // Compute (x OR y)
+
+// Compute XOR: (x OR y) AND ~(x AND y)
+and               // Stack now contains XOR result
+
+// Store result in argument[2]
+pop argument 2    // argument[2] = x XOR y
+
+// Ensure the result is at the bottom of the stack
+push argument 2   // Push z back onto stack
