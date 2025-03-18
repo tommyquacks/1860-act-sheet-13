@@ -1,8 +1,9 @@
 // AbsoluteValue.vm
 // Computes |x| and stores it in argument[1]
-// Also sets argument[2] if x is negative
-// Sets argument[3] if absolute value can't be computed
+// Sets argument[2] if x is negative
+// Sets argument[3] if absolute value cannot be computed
 
+function Main 0  
 
 // Push x onto the stack
 push argument 0    
@@ -18,7 +19,7 @@ if-goto NEGATIVE
 push argument 0    
 pop argument 1     
 
-// Store 0 in argument[2] (x is not negative)
+// Store 0 in argument[2] (x was not negative)
 push constant 0
 pop argument 2
 
@@ -29,7 +30,13 @@ pop argument 3
 goto END            
 
 (NEGATIVE)
-// Compute -x
+// Special case: Check if x == -32768
+push argument 0
+push constant -32768
+eq
+if-goto INVALID    // If x == -32768, computation is invalid
+
+// Compute -x normally
 push argument 0
 neg
 pop argument 1    
@@ -38,11 +45,22 @@ pop argument 1
 push constant 1
 pop argument 2
 
-// Absolute values are always computable in Hack VM
+// Store 0 in argument[3] (valid computation)
 push constant 0
 pop argument 3  
+
+goto END
+
+(INVALID)
+// If absolute value cannot be computed
+push constant 1
+pop argument 3  // Set argument[3] = 1
+
+// Ensure argument[1] is not modified
+goto END
 
 (END)
 push argument 1  
 
 return
+
