@@ -1,46 +1,23 @@
 // AbsoluteValue.vm
-// Computes |x| and stores it in argument[1]
-// Also sets argument[2] if x is negative
-// Sets argument[3] if absolute value can't be computed
+// Compute z = |x|, store in argument[1], set flags in argument[2] and [3]
 
-// Load x onto the stack
-push argument 0    
-
-// Duplicate x (needed for comparison)
-push argument 0    
-
-// Check if x < 0
-lt                
-if-goto NEGATIVE   // If x < 0, go to NEGATIVE
-
-// If x >= 0, store x directly in argument[1]
-push argument 0    
-pop argument 1      // argument[1] = |x|
-
-// Store 0 in argument[2] (x is not negative)
-push constant 0
-pop argument 2
-
-// Set argument[3] to 0 (absolute value computed successfully)
-push constant 0
-pop argument 3
-
-goto END            // Jump to end
-
-(NEGATIVE)
-// Compute -x (negate the top of the stack)
-push argument 0
-neg
-pop argument 1      // argument[1] = -x
-
-// Store 1 in argument[2] (x was negative)
-push constant 1
-pop argument 2
-
-// Check if absolute value is valid (in Hack VM, all numbers are valid)
-push constant 0
-pop argument 3      // Set argument[3] to 0 (valid computation)
-
-// Jump to end
-(END)
-push argument 1  // Leave the absolute value at the bottom of the stack
+push argument 0     // Push x
+push constant 0     // Push 0
+lt                  // Compare x < 0, result (1 or 0) on stack
+pop argument 2      // Store sign flag in argument[2]
+push argument 0     // Push x
+neg                 // Stack: -x
+push argument 0     // Push x
+eq                  // Check if x == -x (true only for 0 or -32768)
+push constant 0     // Push 0
+eq                  // Invert (0 becomes 1 for -32768)
+pop argument 3      // Store overflow flag in argument[3]
+push argument 0     // Push x
+neg                 // Stack: -x (for |x|)
+push constant 0     // Push 0
+lt                  // Check if -x < 0 (true if x > 0 or overflow)
+if-goto POSITIVE    // If -x < 0, x is positive or overflow, skip negate
+push argument 0     // Push x
+neg                 // Negate x to get |x|
+(POSITIVE)
+pop argument 1      // Store |x| in argument[1]
