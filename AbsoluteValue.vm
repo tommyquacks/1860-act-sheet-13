@@ -1,23 +1,21 @@
 // AbsoluteValue.vm
 // Compute z = |x|, store in argument[1], set flags in argument[2] and [3]
-
-push argument 0     // Push x
+push argument 0     // Push x (-10)
 push constant 0     // Push 0
-lt                  // Compare x < 0, result (1 or 0) on stack
-pop argument 2      // Store sign flag in argument[2]
-push argument 0     // Push x
-neg                 // Stack: -x
-push argument 0     // Push x
-eq                  // Check if x == -x (true only for 0 or -32768)
+lt                  // Compare x < 0, result (1) on stack
+pop argument 2      // Store sign flag (1) in argument[2] (RAM[502])
+push argument 0     // Push x (-10)
+neg                 // Stack: -(-10) = 10
+push argument 0     // Push x (-10)
+eq                  // Check if x == -x (false, -10 != 10), stack: 0
 push constant 0     // Push 0
-eq                  // Invert (0 becomes 1 for -32768)
-pop argument 3      // Store overflow flag in argument[3]
-push argument 0     // Push x
-neg                 // Stack: -x (for |x|)
-push constant 0     // Push 0
-lt                  // Check if -x < 0 (true if x > 0 or overflow)
-if-goto POSITIVE    // If -x < 0, x is positive or overflow, skip negate
-push argument 0     // Push x
-neg                 // Negate x to get |x|
-(POSITIVE)
-pop argument 1      // Store |x| in argument[1]
+eq                  // Invert (0 == 0 is true, so 0 becomes 1), stack: 1
+pop argument 3      // Store overflow flag (1) in argument[3] (RAM[503]) - ERROR HERE
+push argument 0     // Push x (-10)
+push argument 2     // Push sign flag (1)
+if-goto NEGATE      // Since 1 (true), jump to NEGATE
+goto END            // Skipped
+(NEGATE)
+neg                 // Negate x again: -(-10) = 10
+(END)
+pop argument 1      // Store 10 in argument[1] (RAM[501])
