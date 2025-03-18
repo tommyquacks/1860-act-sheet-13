@@ -1,0 +1,6 @@
+// Square.vm
+// Compute y = x^2, leave at bottom of stack
+
+push argument 0     // Push x
+push argument 0     // Push x again
+mult                // Stack: x * x
