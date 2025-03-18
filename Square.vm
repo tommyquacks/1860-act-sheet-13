@@ -1,6 +1,19 @@
 // Square.vm
-// Compute y = x^2, leave at bottom of stack
+// Computes y = x^2 and leaves result at the bottom of the stack
 
-push argument 0     // Push x
-push argument 0     // Push x again
-mult                // Stack: x * x
+function Main 0  
+
+// Load x
+push argument 0   
+push argument 0   
+
+// Multiply x by x
+mul                
+
+// Store result in argument[1]
+pop argument 1    
+
+// Leave result at bottom of stack
+push argument 1   
+
+return
