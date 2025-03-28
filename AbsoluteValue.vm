@@ -1,66 +1,36 @@
 // AbsoluteValue.vm
-// Computes |x| and stores it in argument[1]
-// Sets argument[2] if x is negative
-// Sets argument[3] if absolute value cannot be computed
-
-function Main 0  
-
-// Push x onto the stack
-push argument 0    
-
-// Duplicate x (needed for comparison)
-push argument 0    
-
-// Check if x < 0
-lt                
-if-goto NEGATIVE   
-
-// If x >= 0, store x directly in argument[1]
-push argument 0    
-pop argument 1     
-
-// Store 0 in argument[2] (x was not negative)
-push constant 0
-pop argument 2
-
-// Set argument[3] to 0 (valid computation)
-push constant 0
-pop argument 3
-
-goto END            
-
-(NEGATIVE)
-// Special case: Check if x == -32768
-push argument 0
-push constant -32768
-eq
-if-goto INVALID    // If x == -32768, computation is invalid
-
-// Compute -x normally
-push argument 0
-neg
-pop argument 1    
-
-// Store 1 in argument[2] (x was negative)
-push constant 1
-pop argument 2
-
-// Store 0 in argument[3] (valid computation)
-push constant 0
-pop argument 3  
-
+push argument 0       // Stack: [x]
+push constant 0       // Stack: [x, 0]
+lt                    // Stack: [-1 if x < 0, else 0]
+if-goto NEGATIVE      // Branch if x < 0
+push argument 0       // Stack: [x]
+pop argument 1        // argument[1] = x
+push constant 0       // Stack: [0]
+pop argument 2        // argument[2] = 0
+push constant 0       // Stack: [0]
+pop argument 3        // argument[3] = 0
 goto END
-
-(INVALID)
-// If absolute value cannot be computed
-push constant 1
-pop argument 3  // Set argument[3] = 1
-
-// Ensure argument[1] is not modified
+label NEGATIVE
+push argument 0       // Stack: [x]
+neg                   // Stack: [-x]
+pop temp 0            // Stack: [], temp0 = -x
+push temp 0           // Stack: [-x]
+push constant 0       // Stack: [-x, 0]
+gt                    // Stack: [1 if -x > 0, else 0]
+if-goto COMPUTABLE    // Branch if computable
+push temp 0           // Stack: [-x]
+pop argument 1        // argument[1] = -x
+push constant 1       // Stack: [1]
+pop argument 2        // argument[2] = 1
+push constant 1       // Stack: [1]
+pop argument 3        // argument[3] = 1
 goto END
-
-(END)
-push argument 1  
-
-return
+label COMPUTABLE
+push temp 0           // Stack: [-x]
+pop argument 1        // argument[1] = -x
+push constant 1       // Stack: [1]
+pop argument 2        // argument[2] = 1
+push constant 0       // Stack: [0]
+pop argument 3        // argument[3] = 0
+label END
 
