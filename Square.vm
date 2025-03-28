@@ -1,19 +1,45 @@
 // Square.vm
-// Computes y = x^2 and leaves result at the bottom of the stack
-
-function Main 0  
-
-// Load x
-push argument 0   
-push argument 0   
-
-// Multiply x by x
-mul                
-
-// Store result in argument[1]
-pop argument 1    
-
-// Leave result at bottom of stack
-push argument 1   
-
-return
+// Compute |x|
+push argument 0       // Stack: [x]
+push constant 0       // Stack: [x, 0]
+lt                    // Stack: [-1 if x < 0, else 0]
+if-goto NEG
+push argument 0       // Stack: [x]
+pop local 0           // local[0] = x
+goto COMPUTE
+label NEG
+push argument 0       // Stack: [x]
+neg                   // Stack: [-x]
+pop temp 0            // Stack: [], temp0 = -x
+push temp 0           // Stack: [-x]
+push constant 0       // Stack: [-x, 0]
+gt                    // Stack: [1 if -x > 0, else 0]
+if-goto SET_ABS
+push constant 0       // Stack: [0]
+pop local 0           // local[0] = 0 (for x = -32768)
+goto COMPUTE
+label SET_ABS
+push temp 0           // Stack: [-x]
+pop local 0           // local[0] = -x
+label COMPUTE
+push constant 0       // Stack: [0]
+pop local 1           // local[1] = y = 0
+push constant 0       // Stack: [0]
+pop local 2           // local[2] = counter = 0
+label LOOP
+push local 2          // Stack: [counter]
+push local 0          // Stack: [counter, |x|]
+lt                    // Stack: [1 if counter < |x|, else 0]
+not                   // Stack: [0 if counter < |x|, else 1]
+if-goto END_LOOP      // Exit if counter >= |x|
+push local 1          // Stack: [y]
+push local 0          // Stack: [y, |x|]
+add                   // Stack: [y + |x|]
+pop local 1           // local[1] = y + |x|
+push local 2          // Stack: [counter]
+push constant 1       // Stack: [counter, 1]
+add                   // Stack: [counter + 1]
+pop local 2           // local[2] = counter + 1
+goto LOOP
+label END_LOOP
+push local 1          // Stack: [y]
